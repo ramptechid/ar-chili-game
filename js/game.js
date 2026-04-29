@@ -89,6 +89,7 @@ const motionStatus = document.getElementById("motionStatus");
 ========================= */
 
 const GAME_DURATION = 60;
+const PLAY_AGAIN_COOLDOWN = 5;
 const SPAWN_SPEED = 1300;
 const CHILI_LIFETIME_MIN = 3300;
 const CHILI_LIFETIME_MAX = 4600;
@@ -108,6 +109,7 @@ let scoreSaved = false;
 let timerInterval = null;
 let spawnInterval = null;
 let motionCheckInterval = null;
+let playAgainCooldownInterval = null;
 
 let cameraStarted = false;
 let cameraStream = null;
@@ -382,6 +384,7 @@ function endGame() {
   scoreSaved = false;
   topFiveInfo.classList.add("hidden");
   saveScoreBtn.classList.remove("hidden");
+  startPlayAgainCooldown();
 
   loadLeaderboard();
 
@@ -396,6 +399,7 @@ function endGame() {
 
 function resetToIntro() {
   gameRunning = false;
+  clearPlayAgainCooldown();
 
   clearInterval(timerInterval);
   clearInterval(spawnInterval);
@@ -424,6 +428,34 @@ function resetToIntro() {
   document.body.classList.remove("game-mode");
   document.body.classList.remove("result-mode");
   document.body.classList.add("intro-mode");
+}
+
+function startPlayAgainCooldown() {
+  let cooldownLeft = PLAY_AGAIN_COOLDOWN;
+
+  clearPlayAgainCooldown();
+
+  playAgainBtn.disabled = true;
+  playAgainBtn.textContent = `Play Again (${cooldownLeft})`;
+
+  playAgainCooldownInterval = setInterval(() => {
+    cooldownLeft--;
+
+    if (cooldownLeft <= 0) {
+      clearPlayAgainCooldown();
+      return;
+    }
+
+    playAgainBtn.textContent = `Play Again (${cooldownLeft})`;
+  }, 1000);
+}
+
+function clearPlayAgainCooldown() {
+  clearInterval(playAgainCooldownInterval);
+  playAgainCooldownInterval = null;
+
+  playAgainBtn.disabled = false;
+  playAgainBtn.textContent = "Play Again";
 }
 
 /* =========================

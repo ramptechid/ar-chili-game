@@ -124,6 +124,10 @@
 
       <div id="finalScoreText" class="final-score">0</div>
 
+      <div id="topFiveInfo" class="top-five-info hidden">
+        Your score made it into the Top 5!
+      </div>
+
       <div class="leaderboard-box">
         <h3>Leaderboard</h3>
         <div id="leaderboardList" class="leaderboard-list"></div>
@@ -133,12 +137,64 @@
         Share Score Image
       </button>
 
+      <button id="saveScoreBtn" class="secondary-btn">
+        Save Score
+      </button>
+
       <button id="playAgainBtn" class="primary-btn">
         Play Again
       </button>
 
     </div>
   </section>
+
+  <!-- SAVE SCORE MODAL -->
+  <div id="saveScoreModal" class="save-modal hidden">
+    <div class="save-modal-card">
+      <h2>Save Your Score</h2>
+
+      <p class="modal-score-label">Your Score</p>
+      <div id="modalScoreText" class="modal-score-value">0</div>
+
+      <label class="name-label" for="playerNameInput">
+        Your Name
+      </label>
+
+      <input
+        id="playerNameInput"
+        class="name-input"
+        type="text"
+        maxlength="100"
+        placeholder="Enter your name"
+      />
+
+      <label class="name-label email-label" for="playerEmailInput">
+        Your Email
+      </label>
+
+      <input
+        id="playerEmailInput"
+        class="name-input"
+        type="email"
+        maxlength="150"
+        placeholder="Enter your email"
+      />
+
+      <p class="email-note">
+        Please use a valid email. This email will be used for score redemption.
+      </p>
+
+      <div id="saveMessage" class="save-message"></div>
+
+      <button id="submitScoreBtn" class="primary-btn">
+        Save
+      </button>
+
+      <button id="closeSaveModalBtn" class="secondary-btn">
+        Cancel
+      </button>
+    </div>
+  </div>
 
   <script src="js/game.js"></script>
 </body>

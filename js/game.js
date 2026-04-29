@@ -8,6 +8,7 @@ const gameHud = document.getElementById("gameHud");
 const startBtn = document.getElementById("startBtn");
 const playAgainBtn = document.getElementById("playAgainBtn");
 const shareBtn = document.getElementById("shareBtn");
+const catchBtn = document.getElementById("catchBtn");
 
 const scoreText = document.getElementById("scoreText");
 const timerText = document.getElementById("timerText");
@@ -15,8 +16,8 @@ const finalScoreText = document.getElementById("finalScoreText");
 const leaderboardList = document.getElementById("leaderboardList");
 
 const GAME_DURATION = 60;
-const SPAWN_SPEED = 700;
-const CHILI_LIFETIME = 1400;
+const SPAWN_SPEED = 1300;
+const CHILI_LIFETIME = 4200;
 const LEADERBOARD_KEY = "chili_hunt_leaderboard";
 
 let score = 0;
@@ -32,6 +33,7 @@ let cameraStream = null;
 startBtn.addEventListener("click", startGame);
 playAgainBtn.addEventListener("click", backToIntro);
 shareBtn.addEventListener("click", shareScoreImage);
+catchBtn.addEventListener("click", catchChiliByMarker);
 
 async function startCamera() {
   if (cameraStarted && cameraStream) {
@@ -126,9 +128,10 @@ function runTimer() {
 function runSpawner() {
   clearInterval(spawnInterval);
 
+  spawnChili();
+
   spawnInterval = setInterval(() => {
     if (!gameRunning) return;
-
     spawnChili();
   }, SPAWN_SPEED);
 }
@@ -137,43 +140,134 @@ function spawnChili() {
   const chili = document.createElement("img");
 
   chili.src = "assets/images/chili-green.png";
-  chili.className = "chili";
+  chili.className = "chili moving-chili";
   chili.alt = "Green Chili";
 
-  const size = randomNumber(58, 92);
-
+  const size = randomNumber(62, 92);
   chili.style.width = `${size}px`;
 
-  const safeTop = 130;
-  const safeBottom = 165;
-  const safeSide = 24;
+  const startSide = randomNumber(0, 3);
 
-  const maxX = window.innerWidth - size - safeSide;
-  const maxY = window.innerHeight - size - safeBottom;
+  let startX;
+  let startY;
+  let endX;
+  let endY;
 
-  const x = randomNumber(safeSide, Math.max(safeSide, maxX));
-  const y = randomNumber(safeTop, Math.max(safeTop, maxY));
+  const margin = 120;
 
-  chili.style.left = `${x}px`;
-  chili.style.top = `${y}px`;
+  if (startSide === 0) {
+    startX = -margin;
+    startY = randomNumber(150, window.innerHeight - 230);
+    endX = window.innerWidth + margin;
+    endY = randomNumber(150, window.innerHeight - 230);
+  } else if (startSide === 1) {
+    startX = window.innerWidth + margin;
+    startY = randomNumber(150, window.innerHeight - 230);
+    endX = -margin;
+    endY = randomNumber(150, window.innerHeight - 230);
+  } else if (startSide === 2) {
+    startX = randomNumber(40, window.innerWidth - 100);
+    startY = -margin;
+    endX = randomNumber(40, window.innerWidth - 100);
+    endY = window.innerHeight + margin;
+  } else {
+    startX = randomNumber(40, window.innerWidth - 100);
+    startY = window.innerHeight + margin;
+    endX = randomNumber(40, window.innerWidth - 100);
+    endY = -margin;
+  }
 
-  const rotate = randomNumber(-18, 18);
+  chili.style.left = `${startX}px`;
+  chili.style.top = `${startY}px`;
+
+  const rotate = randomNumber(-20, 20);
   chili.style.rotate = `${rotate}deg`;
 
   gameArea.appendChild(chili);
 
-  const collectHandler = () => {
-    collectChili(chili, x, y);
-  };
+  const duration = randomNumber(3200, CHILI_LIFETIME);
 
-  chili.addEventListener("click", collectHandler);
-  chili.addEventListener("touchstart", collectHandler, { passive: true });
+  chili.animate(
+    [
+      {
+        left: `${startX}px`,
+        top: `${startY}px`,
+        transform: "scale(0.9)"
+      },
+      {
+        left: `${(startX + endX) / 2}px`,
+        top: `${(startY + endY) / 2}px`,
+        transform: "scale(1.12)"
+      },
+      {
+        left: `${endX}px`,
+        top: `${endY}px`,
+        transform: "scale(0.95)"
+      }
+    ],
+    {
+      duration: duration,
+      easing: "ease-in-out",
+      fill: "forwards"
+    }
+  );
 
   setTimeout(() => {
     if (chili.parentElement) {
       chili.remove();
     }
-  }, CHILI_LIFETIME);
+  }, duration);
+}
+
+function catchChiliByMarker() {
+  if (!gameRunning) return;
+
+  const target = document.querySelector(".aim-area");
+  const chilies = document.querySelectorAll(".chili");
+
+  if (!target || chilies.length === 0) {
+    showMissEffect();
+    return;
+  }
+
+  const targetRect = target.getBoundingClientRect();
+
+  const targetCenterX = targetRect.left + targetRect.width / 2;
+  const targetCenterY = targetRect.top + targetRect.height / 2;
+
+  const catchRadius = targetRect.width * 0.38;
+
+  let caughtChili = null;
+  let caughtX = 0;
+  let caughtY = 0;
+
+  chilies.forEach((chili) => {
+    if (caughtChili) return;
+
+    const chiliRect = chili.getBoundingClientRect();
+
+    const chiliCenterX = chiliRect.left + chiliRect.width / 2;
+    const chiliCenterY = chiliRect.top + chiliRect.height / 2;
+
+    const distance = getDistance(
+      targetCenterX,
+      targetCenterY,
+      chiliCenterX,
+      chiliCenterY
+    );
+
+    if (distance <= catchRadius) {
+      caughtChili = chili;
+      caughtX = chiliRect.left;
+      caughtY = chiliRect.top;
+    }
+  });
+
+  if (caughtChili) {
+    collectChili(caughtChili, caughtX, caughtY);
+  } else {
+    showMissEffect();
+  }
 }
 
 function collectChili(chili, x, y) {
@@ -188,6 +282,16 @@ function collectChili(chili, x, y) {
   createPlusOne(x, y);
 
   chili.remove();
+}
+
+function showMissEffect() {
+  const target = document.querySelector(".aim-area");
+
+  if (!target) return;
+
+  target.classList.remove("miss");
+  void target.offsetWidth;
+  target.classList.add("miss");
 }
 
 function createHitEffect(x, y) {
@@ -383,11 +487,6 @@ function createScoreImageBlob(scoreValue) {
     ctx.arc(540, 360, 330, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "rgba(185, 255, 106, 0.08)";
-    ctx.beginPath();
-    ctx.arc(120, 1600, 280, 0, Math.PI * 2);
-    ctx.fill();
-
     ctx.font = "900 82px Arial";
     ctx.fillStyle = "#caff72";
     ctx.textAlign = "center";
@@ -415,10 +514,6 @@ function createScoreImageBlob(scoreValue) {
     ctx.font = "700 38px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.fillText("Play now and collect more chilies!", 540, 1495);
-
-    ctx.font = "400 30px Arial";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-    ctx.fillText("Share your score", 540, 1690);
 
     canvas.toBlob((blob) => {
       resolve(blob);
@@ -457,6 +552,13 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
+}
+
+function getDistance(x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 function randomNumber(min, max) {

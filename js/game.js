@@ -19,7 +19,7 @@ const GAME_DURATION = 60;
 const SPAWN_SPEED = 1300;
 const CHILI_LIFETIME_MIN = 3300;
 const CHILI_LIFETIME_MAX = 4600;
-const LEADERBOARD_KEY = "indomie_cabe_ijo_hunt_leaderboard";
+const LEADERBOARD_KEY = "green_chili_hunt_leaderboard";
 
 let score = 0;
 let timeLeft = GAME_DURATION;
@@ -31,8 +31,10 @@ let spawnInterval = null;
 let cameraStarted = false;
 let cameraStream = null;
 
+document.body.classList.add("intro-mode");
+
 startBtn.addEventListener("click", startGame);
-playAgainBtn.addEventListener("click", backToIntro);
+playAgainBtn.addEventListener("click", resetToIntro);
 shareBtn.addEventListener("click", shareScoreImage);
 catchBtn.addEventListener("click", catchChiliByMarker);
 
@@ -66,11 +68,23 @@ async function startCamera() {
     console.error("Camera error:", error);
 
     alert(
-      "Akses kamera dibutuhkan untuk memainkan game ini. Silakan izinkan akses kamera."
+      "Camera access is required to play this game. Please allow camera access."
     );
 
     return false;
   }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach((track) => {
+      track.stop();
+    });
+  }
+
+  cameraStream = null;
+  cameraStarted = false;
+  cameraView.srcObject = null;
 }
 
 async function startGame() {
@@ -81,6 +95,10 @@ async function startGame() {
   }
 
   resetGameData();
+
+  document.body.classList.remove("intro-mode");
+  document.body.classList.remove("result-mode");
+  document.body.classList.add("game-mode");
 
   introScreen.classList.remove("active");
   resultScreen.classList.remove("active");
@@ -142,7 +160,7 @@ function spawnChili() {
 
   chili.src = "assets/images/chili-green.png";
   chili.className = "chili moving-chili";
-  chili.alt = "Cabe Ijo";
+  chili.alt = "Green Chili";
 
   const size = randomNumber(64, 96);
   chili.style.width = `${size}px`;
@@ -159,7 +177,7 @@ function spawnChili() {
 
   const duration = randomNumber(CHILI_LIFETIME_MIN, CHILI_LIFETIME_MAX);
 
-  const animation = chili.animate(
+  chili.animate(
     [
       {
         left: `${movement.startX}px`,
@@ -383,10 +401,15 @@ function endGame() {
   saveLeaderboard(score);
   renderLeaderboard();
 
+  stopCamera();
+
+  document.body.classList.remove("game-mode");
+  document.body.classList.add("result-mode");
+
   resultScreen.classList.add("active");
 }
 
-function backToIntro() {
+function resetToIntro() {
   gameRunning = false;
 
   clearInterval(timerInterval);
@@ -394,15 +417,22 @@ function backToIntro() {
 
   gameArea.innerHTML = "";
 
-  resultScreen.classList.remove("active");
-  gameHud.classList.add("hidden");
-  introScreen.classList.add("active");
+  stopCamera();
 
   score = 0;
   timeLeft = GAME_DURATION;
 
   scoreText.textContent = score;
   timerText.textContent = timeLeft;
+  finalScoreText.textContent = score;
+
+  resultScreen.classList.remove("active");
+  gameHud.classList.add("hidden");
+  introScreen.classList.add("active");
+
+  document.body.classList.remove("game-mode");
+  document.body.classList.remove("result-mode");
+  document.body.classList.add("intro-mode");
 }
 
 function saveLeaderboard(newScore) {
@@ -448,7 +478,7 @@ function renderLeaderboard() {
     emptyRow.className = "leaderboard-item";
     emptyRow.innerHTML = `
       <span class="leaderboard-rank">-</span>
-      <span class="leaderboard-name">Belum ada skor</span>
+      <span class="leaderboard-name">No score yet</span>
       <span class="leaderboard-score">0</span>
     `;
 
@@ -477,7 +507,7 @@ async function shareScoreImage() {
 
     const file = new File(
       [imageBlob],
-      "indomie-cabe-ijo-hunt-score.png",
+      "green-chili-hunt-score.png",
       {
         type: "image/png"
       }
@@ -485,8 +515,8 @@ async function shareScoreImage() {
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
-        title: "Indomie Cabe Ijo Hunt Score",
-        text: `Aku berhasil mengumpulkan ${score} Cabe Ijo di Indomie Cabe Ijo Hunt!`,
+        title: "Green Chili Hunt Score",
+        text: `I collected ${score} green chilies in Green Chili Hunt!`,
         files: [file]
       });
 
@@ -495,8 +525,8 @@ async function shareScoreImage() {
 
     if (navigator.share) {
       await navigator.share({
-        title: "Indomie Cabe Ijo Hunt Score",
-        text: `Aku berhasil mengumpulkan ${score} Cabe Ijo di Indomie Cabe Ijo Hunt!`
+        title: "Green Chili Hunt Score",
+        text: `I collected ${score} green chilies in Green Chili Hunt!`
       });
 
       return;
@@ -505,7 +535,7 @@ async function shareScoreImage() {
     downloadScoreImage(imageBlob);
   } catch (error) {
     console.error("Share error:", error);
-    alert("Fitur share tidak tersedia di browser ini.");
+    alert("Share is not available on this browser.");
   }
 }
 
@@ -536,17 +566,14 @@ function createScoreImageBlob(scoreValue) {
     ctx.arc(130, 1600, 290, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = "900 70px Arial";
+    ctx.font = "900 76px Arial";
     ctx.fillStyle = "#caff72";
     ctx.textAlign = "center";
-    ctx.fillText("INDOMIE", 540, 260);
-
-    ctx.font = "900 76px Arial";
-    ctx.fillText("CABE IJO HUNT", 540, 350);
+    ctx.fillText("GREEN CHILI HUNT", 540, 320);
 
     ctx.font = "400 44px Arial";
     ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
-    ctx.fillText("Skor Cabe Ijo Kamu", 540, 545);
+    ctx.fillText("My Final Score", 540, 545);
 
     ctx.font = "900 230px Arial";
     ctx.fillStyle = "#ffffff";
@@ -556,7 +583,7 @@ function createScoreImageBlob(scoreValue) {
 
     ctx.font = "500 44px Arial";
     ctx.fillStyle = "rgba(255, 255, 255, 0.84)";
-    ctx.fillText("Berani kalahkan skor aku?", 540, 1290);
+    ctx.fillText("Can you beat my score?", 540, 1290);
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
     roundRect(ctx, 150, 1420, 780, 145, 42);
@@ -564,7 +591,7 @@ function createScoreImageBlob(scoreValue) {
 
     ctx.font = "700 38px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("Main sekarang dan kumpulkan Cabe Ijo!", 540, 1508);
+    ctx.fillText("Play now and collect green chilies!", 540, 1508);
 
     ctx.font = "400 30px Arial";
     ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
@@ -610,7 +637,7 @@ function downloadScoreImage(blob) {
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = "indomie-cabe-ijo-hunt-score.png";
+  link.download = "green-chili-hunt-score.png";
 
   document.body.appendChild(link);
   link.click();

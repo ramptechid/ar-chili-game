@@ -73,10 +73,6 @@
   opacity: 0.94;
 }
 
-.game-brand span {
-  color: rgba(255, 255, 255, 0.82);
-}
-
 .game-brand b {
   color: #caff72;
 }
@@ -223,19 +219,6 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-}
-
-.campaign-label {
-  display: inline-flex;
-  margin-bottom: 14px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  color: #caff72;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 1.4px;
-  background: rgba(202, 255, 114, 0.1);
-  border: 1px solid rgba(202, 255, 114, 0.2);
 }
 
 .logo-badge {

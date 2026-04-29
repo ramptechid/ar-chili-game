@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
 
@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
 
-  <title>Indomie Cabe Ijo Hunt</title>
+  <title>Green Chili Hunt</title>
 
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/hud.css" />
@@ -21,30 +21,29 @@
   <!-- CAMERA OVERLAY -->
   <div class="camera-overlay"></div>
 
-  <!-- GAME AREA UNTUK CABE -->
+  <!-- GAME AREA -->
   <div id="gameArea"></div>
 
-  <!-- HUD SAAT GAME -->
+  <!-- IN-GAME HUD -->
   <div id="gameHud" class="game-hud hidden">
 
     <div class="top-hud">
       <div class="hud-card">
-        <span class="hud-label">SKOR</span>
+        <span class="hud-label">SCORE</span>
         <span id="scoreText" class="hud-value">0</span>
       </div>
 
       <div class="timer-card">
-        <span class="hud-label">WAKTU</span>
+        <span class="hud-label">TIME</span>
         <span id="timerText" class="timer-value">60</span>
       </div>
     </div>
 
     <div class="game-brand">
-      <span>INDOMIE</span>
-      <b>CABE IJO HUNT</b>
+      <b>GREEN CHILI HUNT</b>
     </div>
 
-    <!-- MARKER TARGET -->
+    <!-- TARGET MARKER -->
     <div class="aim-area">
       <div class="aim-circle"></div>
       <div class="aim-dot"></div>
@@ -53,11 +52,11 @@
 
     <div class="bottom-hud">
       <div class="hint-box">
-        Pasangkan cabe ijo ke marker, lalu tekan TANGKAP!
+        Align the green chili with the marker, then press CATCH!
       </div>
 
       <button id="catchBtn" class="catch-btn">
-        TANGKAP
+        CATCH
       </button>
     </div>
 
@@ -67,38 +66,36 @@
   <section id="introScreen" class="screen active">
     <div class="intro-card">
 
-      <div class="campaign-label">CAMPAIGN GAME</div>
-
       <div class="logo-badge">
         <img
           src="assets/images/chili-green.png"
-          alt="Cabe Ijo"
+          alt="Green Chili"
           class="logo-image"
         />
       </div>
 
-      <h1>Indomie Cabe Ijo Hunt</h1>
+      <h1>Green Chili Hunt</h1>
 
       <p class="intro-desc">
-        Kumpulkan cabe ijo sebanyak-banyaknya dalam 60 detik.
-        Arahkan cabe ke area marker, lalu tekan tombol
-        <b>TANGKAP</b> untuk mendapatkan poin!
+        Collect as many green chilies as possible in 60 seconds.
+        Align the chili with the marker, then press
+        <b>CATCH</b> to score points!
       </p>
 
       <div class="how-to-box">
-        <h3>Cara Main</h3>
+        <h3>How to Play</h3>
 
         <ul>
-          <li>Izinkan akses kamera.</li>
-          <li>Cabe ijo akan bergerak di layar.</li>
-          <li>Pasangkan cabe ijo ke area marker.</li>
-          <li>Tekan tombol TANGKAP saat posisinya pas.</li>
-          <li>Kumpulkan skor tertinggi!</li>
+          <li>Allow camera access.</li>
+          <li>Green chilies will move across the screen.</li>
+          <li>Align the chili with the target marker.</li>
+          <li>Press CATCH when the position is right.</li>
+          <li>Collect the highest score!</li>
         </ul>
       </div>
 
       <button id="startBtn" class="primary-btn">
-        Mulai Berburu Cabe Ijo
+        Start Game
       </button>
 
     </div>
@@ -108,19 +105,17 @@
   <section id="resultScreen" class="screen">
     <div class="result-card">
 
-      <div class="campaign-label">HASIL PERMAINAN</div>
-
       <div class="logo-badge">
         <img
           src="assets/images/chili-green.png"
-          alt="Cabe Ijo"
+          alt="Green Chili"
           class="logo-image"
         />
       </div>
 
-      <h1>Waktu Habis!</h1>
+      <h1>Time's Up!</h1>
 
-      <p class="result-label">Skor Cabe Ijo Kamu</p>
+      <p class="result-label">Your Final Score</p>
 
       <div id="finalScoreText" class="final-score">0</div>
 
@@ -130,11 +125,11 @@
       </div>
 
       <button id="shareBtn" class="secondary-btn">
-        Share Image Score
+        Share Score Image
       </button>
 
       <button id="playAgainBtn" class="primary-btn">
-        Main Lagi
+        Play Again
       </button>
 
     </div>

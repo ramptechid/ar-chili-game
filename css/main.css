@@ -49,7 +49,7 @@ body {
     linear-gradient(to bottom, rgba(0, 35, 8, 0.52), transparent 34%, rgba(0, 20, 8, 0.72));
 }
 
-/* CAMERA HANYA MUNCUL SAAT GAME */
+/* CAMERA ONLY SHOWS DURING GAME */
 body.game-mode #cameraView {
   opacity: 1;
 }
@@ -58,7 +58,7 @@ body.game-mode .camera-overlay {
   opacity: 1;
 }
 
-/* INTRO / RESULT: CAMERA TERTUTUP */
+/* INTRO / RESULT: CAMERA HIDDEN */
 body.intro-mode #cameraView,
 body.result-mode #cameraView {
   opacity: 0;
@@ -96,7 +96,7 @@ body.result-mode .camera-overlay {
   transform: scale(0.82);
 }
 
-/* EFFECT SAAT BERHASIL */
+/* SUCCESS EFFECT */
 .hit-effect {
   position: absolute;
   width: 96px;
@@ -117,7 +117,7 @@ body.result-mode .camera-overlay {
   animation: plusOneMove 0.65s ease-out forwards;
 }
 
-/* EFFECT MISS */
+/* MISS EFFECT */
 .miss-text {
   position: fixed;
   left: 50%;

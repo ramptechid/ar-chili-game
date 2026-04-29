@@ -14,6 +14,7 @@ const scoreText = document.getElementById("scoreText");
 const timerText = document.getElementById("timerText");
 const finalScoreText = document.getElementById("finalScoreText");
 const leaderboardList = document.getElementById("leaderboardList");
+const motionStatus = document.getElementById("motionStatus");
 
 const GAME_DURATION = 60;
 const SPAWN_SPEED = 1300;
@@ -21,15 +22,23 @@ const CHILI_LIFETIME_MIN = 3300;
 const CHILI_LIFETIME_MAX = 4600;
 const LEADERBOARD_KEY = "green_chili_hunt_leaderboard";
 
+const MOTION_THRESHOLD = 2.2;
+const MOTION_ACTIVE_TIME = 900;
+
 let score = 0;
 let timeLeft = GAME_DURATION;
 let gameRunning = false;
 
 let timerInterval = null;
 let spawnInterval = null;
+let motionCheckInterval = null;
 
 let cameraStarted = false;
 let cameraStream = null;
+
+let motionEnabled = false;
+let phoneIsMoving = false;
+let lastMotionTime = 0;
 
 document.body.classList.add("intro-mode");
 
@@ -87,6 +96,93 @@ function stopCamera() {
   cameraView.srcObject = null;
 }
 
+async function requestMotionPermission() {
+  if (
+    typeof DeviceMotionEvent !== "undefined" &&
+    typeof DeviceMotionEvent.requestPermission === "function"
+  ) {
+    try {
+      const permission = await DeviceMotionEvent.requestPermission();
+
+      if (permission === "granted") {
+        startMotionDetection();
+        return true;
+      }
+
+      alert("Motion access is needed to search for green chilies.");
+      return false;
+    } catch (error) {
+      console.error("Motion permission error:", error);
+      alert("Motion access is needed to search for green chilies.");
+      return false;
+    }
+  }
+
+  startMotionDetection();
+  return true;
+}
+
+function startMotionDetection() {
+  if (!motionEnabled) {
+    motionEnabled = true;
+    window.addEventListener("devicemotion", handleDeviceMotion, true);
+  }
+
+  clearInterval(motionCheckInterval);
+
+  motionCheckInterval = setInterval(() => {
+    if (!gameRunning) return;
+
+    const now = Date.now();
+    phoneIsMoving = now - lastMotionTime < MOTION_ACTIVE_TIME;
+
+    updateMotionStatus();
+  }, 200);
+}
+
+function stopMotionDetection() {
+  clearInterval(motionCheckInterval);
+  motionCheckInterval = null;
+
+  phoneIsMoving = false;
+  lastMotionTime = 0;
+
+  updateMotionStatus();
+}
+
+function handleDeviceMotion(event) {
+  if (!gameRunning) return;
+
+  const acc = event.accelerationIncludingGravity;
+
+  if (!acc) return;
+
+  const x = acc.x || 0;
+  const y = acc.y || 0;
+  const z = acc.z || 0;
+
+  const movement = Math.sqrt(x * x + y * y + z * z);
+
+  if (movement > MOTION_THRESHOLD) {
+    phoneIsMoving = true;
+    lastMotionTime = Date.now();
+  }
+}
+
+function updateMotionStatus() {
+  if (!motionStatus) return;
+
+  if (phoneIsMoving) {
+    motionStatus.textContent = "Searching... green chilies can appear!";
+    motionStatus.classList.add("active");
+    motionStatus.classList.remove("idle");
+  } else {
+    motionStatus.textContent = "Move your phone to search for green chilies";
+    motionStatus.classList.remove("active");
+    motionStatus.classList.add("idle");
+  }
+}
+
 async function startGame() {
   const cameraReady = await startCamera();
 
@@ -94,7 +190,17 @@ async function startGame() {
     return;
   }
 
+  const motionReady = await requestMotionPermission();
+
+  if (!motionReady) {
+    stopCamera();
+    return;
+  }
+
   resetGameData();
+
+  phoneIsMoving = false;
+  lastMotionTime = 0;
 
   document.body.classList.remove("intro-mode");
   document.body.classList.remove("result-mode");
@@ -105,6 +211,8 @@ async function startGame() {
   gameHud.classList.remove("hidden");
 
   gameRunning = true;
+
+  updateMotionStatus();
 
   runTimer();
   runSpawner();
@@ -147,10 +255,13 @@ function runTimer() {
 function runSpawner() {
   clearInterval(spawnInterval);
 
-  spawnChili();
-
   spawnInterval = setInterval(() => {
     if (!gameRunning) return;
+
+    if (!phoneIsMoving) {
+      return;
+    }
+
     spawnChili();
   }, SPAWN_SPEED);
 }
@@ -215,8 +326,8 @@ function createRandomMovement(size) {
   const side = randomNumber(0, 3);
   const margin = 130;
 
-  const topLimit = 130;
-  const bottomLimit = window.innerHeight - 245;
+  const topLimit = 150;
+  const bottomLimit = window.innerHeight - 260;
   const leftLimit = 30;
   const rightLimit = window.innerWidth - size - 30;
 
@@ -401,6 +512,7 @@ function endGame() {
   saveLeaderboard(score);
   renderLeaderboard();
 
+  stopMotionDetection();
   stopCamera();
 
   document.body.classList.remove("game-mode");
@@ -417,6 +529,7 @@ function resetToIntro() {
 
   gameArea.innerHTML = "";
 
+  stopMotionDetection();
   stopCamera();
 
   score = 0;

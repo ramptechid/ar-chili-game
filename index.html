@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+
+  <title>Chili Hunt AR</title>
+
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/hud.css" />
+</head>
+<body>
+
+  <!-- CAMERA BACKGROUND -->
+  <video id="cameraView" autoplay playsinline muted></video>
+
+  <!-- OVERLAY GELAP -->
+  <div class="camera-overlay"></div>
+
+  <!-- AREA GAME UNTUK CABE -->
+  <div id="gameArea"></div>
+
+  <!-- HUD SAAT GAME -->
+  <div id="gameHud" class="game-hud hidden">
+
+    <div class="top-hud">
+      <div class="hud-card">
+        <span class="hud-label">SCORE</span>
+        <span id="scoreText" class="hud-value">0</span>
+      </div>
+
+      <div class="timer-card">
+        <span class="hud-label">TIME</span>
+        <span id="timerText" class="timer-value">60</span>
+      </div>
+    </div>
+
+    <div class="game-brand">
+      <span>CHILI</span>
+      <b>HUNT</b>
+    </div>
+
+    <div class="aim-area">
+      <div class="aim-circle"></div>
+      <div class="scan-line"></div>
+    </div>
+
+    <div class="bottom-hud">
+      <div class="hint-box">Tap green chili as fast as you can!</div>
+    </div>
+
+  </div>
+
+  <!-- INTRO SCREEN -->
+  <section id="introScreen" class="screen active">
+    <div class="intro-card">
+
+      <div class="logo-badge">🌶️</div>
+
+      <h1>Chili Hunt AR</h1>
+
+      <p class="intro-desc">
+        Collect as many green chilies as possible in 60 seconds.
+        Tap every chili that appears on your screen.
+      </p>
+
+      <div class="how-to-box">
+        <h3>How to Play</h3>
+
+        <ul>
+          <li>Allow camera access.</li>
+          <li>Find the green chili on your screen.</li>
+          <li>Tap quickly to collect points.</li>
+          <li>Get the highest score!</li>
+        </ul>
+      </div>
+
+      <button id="startBtn" class="primary-btn">
+        Start Game
+      </button>
+
+    </div>
+  </section>
+
+  <!-- RESULT SCREEN -->
+  <section id="resultScreen" class="screen">
+    <div class="result-card">
+
+      <div class="logo-badge">🏆</div>
+
+      <h1>Time's Up!</h1>
+
+      <p class="result-label">Your Score</p>
+
+      <div id="finalScoreText" class="final-score">0</div>
+
+      <div class="leaderboard-box">
+        <h3>Leaderboard</h3>
+        <div id="leaderboardList" class="leaderboard-list"></div>
+      </div>
+
+      <button id="shareBtn" class="secondary-btn">
+        Share Score Image
+      </button>
+
+      <button id="playAgainBtn" class="primary-btn">
+        Main Lagi
+      </button>
+
+    </div>
+  </section>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

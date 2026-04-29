@@ -604,6 +604,8 @@ function collectChili(chili, x, y) {
 
   if (!chili || !chili.parentElement) return;
 
+  resetMissEffect();
+
   chili.dataset.caught = "true";
 
   score++;
@@ -622,17 +624,19 @@ function showMissEffect() {
     target.classList.remove("miss");
     void target.offsetWidth;
     target.classList.add("miss");
+
+    setTimeout(() => {
+      target.classList.remove("miss");
+    }, 300);
   }
+}
 
-  const miss = document.createElement("div");
-  miss.className = "miss-text";
-  miss.textContent = "MISS";
+function resetMissEffect() {
+  const target = document.querySelector(".aim-area");
 
-  document.body.appendChild(miss);
-
-  setTimeout(() => {
-    miss.remove();
-  }, 600);
+  if (target) {
+    target.classList.remove("miss");
+  }
 }
 
 function createHitEffect(x, y) {

@@ -9,6 +9,7 @@ html,
 body {
   width: 100%;
   height: 100%;
+  min-height: 100dvh;
   overflow: hidden;
   background: #050805;
   font-family: Arial, Helvetica, sans-serif;
@@ -29,7 +30,7 @@ body {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   object-fit: cover;
   background: #080808;
   z-index: 1;
@@ -78,7 +79,7 @@ body.result-mode .camera-overlay {
 /* CHILI ITEM */
 .chili {
   position: absolute;
-  width: 76px;
+  width: clamp(54px, 10vw, 96px);
   height: auto;
   cursor: pointer;
   user-select: none;
@@ -97,8 +98,8 @@ body.result-mode .camera-overlay {
 /* SUCCESS EFFECT */
 .hit-effect {
   position: absolute;
-  width: 96px;
-  height: 96px;
+  width: clamp(72px, 13vw, 112px);
+  height: clamp(72px, 13vw, 112px);
   border-radius: 50%;
   border: 3px solid rgba(185, 255, 106, 0.95);
   pointer-events: none;
@@ -108,26 +109,11 @@ body.result-mode .camera-overlay {
 .plus-one {
   position: absolute;
   color: #caff72;
-  font-size: 30px;
+  font-size: clamp(22px, 5vw, 34px);
   font-weight: 900;
   text-shadow: 0 5px 14px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   animation: plusOneMove 0.65s ease-out forwards;
-}
-
-/* MISS EFFECT */
-.miss-text {
-  position: fixed;
-  left: 50%;
-  top: 55%;
-  transform: translate(-50%, -50%);
-  z-index: 20;
-  color: #ff6969;
-  font-size: 28px;
-  font-weight: 900;
-  text-shadow: 0 5px 16px rgba(0, 0, 0, 0.65);
-  pointer-events: none;
-  animation: missTextMove 0.55s ease-out forwards;
 }
 
 /* ANIMATIONS */
@@ -182,14 +168,3 @@ body.result-mode .camera-overlay {
   }
 }
 
-@keyframes missTextMove {
-  from {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-
-  to {
-    transform: translate(-50%, -80%) scale(1.12);
-    opacity: 0;
-  }
-}

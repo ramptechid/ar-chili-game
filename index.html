@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
 
@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
 
-  <title>Chili Hunt AR</title>
+  <title>Indomie Cabe Ijo Hunt</title>
 
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/hud.css" />
@@ -18,10 +18,10 @@
   <!-- CAMERA BACKGROUND -->
   <video id="cameraView" autoplay playsinline muted></video>
 
-  <!-- OVERLAY GELAP -->
+  <!-- CAMERA OVERLAY -->
   <div class="camera-overlay"></div>
 
-  <!-- AREA GAME UNTUK CABE -->
+  <!-- GAME AREA UNTUK CABE -->
   <div id="gameArea"></div>
 
   <!-- HUD SAAT GAME -->
@@ -29,32 +29,36 @@
 
     <div class="top-hud">
       <div class="hud-card">
-        <span class="hud-label">SCORE</span>
+        <span class="hud-label">SKOR</span>
         <span id="scoreText" class="hud-value">0</span>
       </div>
 
       <div class="timer-card">
-        <span class="hud-label">TIME</span>
+        <span class="hud-label">WAKTU</span>
         <span id="timerText" class="timer-value">60</span>
       </div>
     </div>
 
     <div class="game-brand">
-      <span>CHILI</span>
-      <b>HUNT</b>
+      <span>INDOMIE</span>
+      <b>CABE IJO HUNT</b>
     </div>
 
+    <!-- MARKER TARGET -->
     <div class="aim-area">
       <div class="aim-circle"></div>
+      <div class="aim-dot"></div>
       <div class="scan-line"></div>
     </div>
 
     <div class="bottom-hud">
-    <div class="hint-box">Arahkan cabe ke area marker, lalu tekan tombol tangkap!</div>
+      <div class="hint-box">
+        Pasangkan cabe ijo ke marker, lalu tekan TANGKAP!
+      </div>
 
-    <button id="catchBtn" class="catch-btn">
+      <button id="catchBtn" class="catch-btn">
         TANGKAP
-    </button>
+      </button>
     </div>
 
   </div>
@@ -63,28 +67,38 @@
   <section id="introScreen" class="screen active">
     <div class="intro-card">
 
-      <div class="logo-badge">🌶️</div>
+      <div class="campaign-label">CAMPAIGN GAME</div>
 
-      <h1>Chili Hunt AR</h1>
+      <div class="logo-badge">
+        <img
+          src="assets/images/chili-green.png"
+          alt="Cabe Ijo"
+          class="logo-image"
+        />
+      </div>
+
+      <h1>Indomie Cabe Ijo Hunt</h1>
 
       <p class="intro-desc">
-        Collect as many green chilies as possible in 60 seconds.
-        Tap every chili that appears on your screen.
+        Kumpulkan cabe ijo sebanyak-banyaknya dalam 60 detik.
+        Arahkan cabe ke area marker, lalu tekan tombol
+        <b>TANGKAP</b> untuk mendapatkan poin!
       </p>
 
       <div class="how-to-box">
-        <h3>How to Play</h3>
+        <h3>Cara Main</h3>
 
         <ul>
-          <li>Allow camera access.</li>
-          <li>Find the green chili on your screen.</li>
-          <li>Tap quickly to collect points.</li>
-          <li>Get the highest score!</li>
+          <li>Izinkan akses kamera.</li>
+          <li>Cabe ijo akan bergerak di layar.</li>
+          <li>Pasangkan cabe ijo ke area marker.</li>
+          <li>Tekan tombol TANGKAP saat posisinya pas.</li>
+          <li>Kumpulkan skor tertinggi!</li>
         </ul>
       </div>
 
       <button id="startBtn" class="primary-btn">
-        Start Game
+        Mulai Berburu Cabe Ijo
       </button>
 
     </div>
@@ -94,11 +108,19 @@
   <section id="resultScreen" class="screen">
     <div class="result-card">
 
-      <div class="logo-badge">🏆</div>
+      <div class="campaign-label">HASIL PERMAINAN</div>
 
-      <h1>Time's Up!</h1>
+      <div class="logo-badge">
+        <img
+          src="assets/images/chili-green.png"
+          alt="Cabe Ijo"
+          class="logo-image"
+        />
+      </div>
 
-      <p class="result-label">Your Score</p>
+      <h1>Waktu Habis!</h1>
+
+      <p class="result-label">Skor Cabe Ijo Kamu</p>
 
       <div id="finalScoreText" class="final-score">0</div>
 
@@ -108,7 +130,7 @@
       </div>
 
       <button id="shareBtn" class="secondary-btn">
-        Share Score Image
+        Share Image Score
       </button>
 
       <button id="playAgainBtn" class="primary-btn">

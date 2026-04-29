@@ -17,8 +17,9 @@ const leaderboardList = document.getElementById("leaderboardList");
 
 const GAME_DURATION = 60;
 const SPAWN_SPEED = 1300;
-const CHILI_LIFETIME = 4200;
-const LEADERBOARD_KEY = "chili_hunt_leaderboard";
+const CHILI_LIFETIME_MIN = 3300;
+const CHILI_LIFETIME_MAX = 4600;
+const LEADERBOARD_KEY = "indomie_cabe_ijo_hunt_leaderboard";
 
 let score = 0;
 let timeLeft = GAME_DURATION;
@@ -65,7 +66,7 @@ async function startCamera() {
     console.error("Camera error:", error);
 
     alert(
-      "Camera permission is required to play this game. Please allow camera access."
+      "Akses kamera dibutuhkan untuk memainkan game ini. Silakan izinkan akses kamera."
     );
 
     return false;
@@ -141,67 +142,38 @@ function spawnChili() {
 
   chili.src = "assets/images/chili-green.png";
   chili.className = "chili moving-chili";
-  chili.alt = "Green Chili";
+  chili.alt = "Cabe Ijo";
 
-  const size = randomNumber(62, 92);
+  const size = randomNumber(64, 96);
   chili.style.width = `${size}px`;
 
-  const startSide = randomNumber(0, 3);
+  const movement = createRandomMovement(size);
 
-  let startX;
-  let startY;
-  let endX;
-  let endY;
-
-  const margin = 120;
-
-  if (startSide === 0) {
-    startX = -margin;
-    startY = randomNumber(150, window.innerHeight - 230);
-    endX = window.innerWidth + margin;
-    endY = randomNumber(150, window.innerHeight - 230);
-  } else if (startSide === 1) {
-    startX = window.innerWidth + margin;
-    startY = randomNumber(150, window.innerHeight - 230);
-    endX = -margin;
-    endY = randomNumber(150, window.innerHeight - 230);
-  } else if (startSide === 2) {
-    startX = randomNumber(40, window.innerWidth - 100);
-    startY = -margin;
-    endX = randomNumber(40, window.innerWidth - 100);
-    endY = window.innerHeight + margin;
-  } else {
-    startX = randomNumber(40, window.innerWidth - 100);
-    startY = window.innerHeight + margin;
-    endX = randomNumber(40, window.innerWidth - 100);
-    endY = -margin;
-  }
-
-  chili.style.left = `${startX}px`;
-  chili.style.top = `${startY}px`;
+  chili.style.left = `${movement.startX}px`;
+  chili.style.top = `${movement.startY}px`;
 
   const rotate = randomNumber(-20, 20);
   chili.style.rotate = `${rotate}deg`;
 
   gameArea.appendChild(chili);
 
-  const duration = randomNumber(3200, CHILI_LIFETIME);
+  const duration = randomNumber(CHILI_LIFETIME_MIN, CHILI_LIFETIME_MAX);
 
-  chili.animate(
+  const animation = chili.animate(
     [
       {
-        left: `${startX}px`,
-        top: `${startY}px`,
+        left: `${movement.startX}px`,
+        top: `${movement.startY}px`,
         transform: "scale(0.9)"
       },
       {
-        left: `${(startX + endX) / 2}px`,
-        top: `${(startY + endY) / 2}px`,
+        left: `${movement.midX}px`,
+        top: `${movement.midY}px`,
         transform: "scale(1.12)"
       },
       {
-        left: `${endX}px`,
-        top: `${endY}px`,
+        left: `${movement.endX}px`,
+        top: `${movement.endY}px`,
         transform: "scale(0.95)"
       }
     ],
@@ -212,11 +184,69 @@ function spawnChili() {
     }
   );
 
+  chili.dataset.caught = "false";
+
   setTimeout(() => {
     if (chili.parentElement) {
       chili.remove();
     }
-  }, duration);
+  }, duration + 80);
+}
+
+function createRandomMovement(size) {
+  const side = randomNumber(0, 3);
+  const margin = 130;
+
+  const topLimit = 130;
+  const bottomLimit = window.innerHeight - 245;
+  const leftLimit = 30;
+  const rightLimit = window.innerWidth - size - 30;
+
+  let startX;
+  let startY;
+  let endX;
+  let endY;
+
+  if (side === 0) {
+    startX = -margin;
+    startY = randomNumber(topLimit, Math.max(topLimit, bottomLimit));
+
+    endX = window.innerWidth + margin;
+    endY = randomNumber(topLimit, Math.max(topLimit, bottomLimit));
+  } else if (side === 1) {
+    startX = window.innerWidth + margin;
+    startY = randomNumber(topLimit, Math.max(topLimit, bottomLimit));
+
+    endX = -margin;
+    endY = randomNumber(topLimit, Math.max(topLimit, bottomLimit));
+  } else if (side === 2) {
+    startX = randomNumber(leftLimit, Math.max(leftLimit, rightLimit));
+    startY = -margin;
+
+    endX = randomNumber(leftLimit, Math.max(leftLimit, rightLimit));
+    endY = window.innerHeight + margin;
+  } else {
+    startX = randomNumber(leftLimit, Math.max(leftLimit, rightLimit));
+    startY = window.innerHeight + margin;
+
+    endX = randomNumber(leftLimit, Math.max(leftLimit, rightLimit));
+    endY = -margin;
+  }
+
+  const centerOffsetX = randomNumber(-80, 80);
+  const centerOffsetY = randomNumber(-80, 80);
+
+  const midX = window.innerWidth / 2 + centerOffsetX;
+  const midY = window.innerHeight * 0.46 + centerOffsetY;
+
+  return {
+    startX,
+    startY,
+    midX,
+    midY,
+    endX,
+    endY
+  };
 }
 
 function catchChiliByMarker() {
@@ -235,7 +265,7 @@ function catchChiliByMarker() {
   const targetCenterX = targetRect.left + targetRect.width / 2;
   const targetCenterY = targetRect.top + targetRect.height / 2;
 
-  const catchRadius = targetRect.width * 0.38;
+  const catchRadius = targetRect.width * 0.39;
 
   let caughtChili = null;
   let caughtX = 0;
@@ -243,6 +273,8 @@ function catchChiliByMarker() {
 
   chilies.forEach((chili) => {
     if (caughtChili) return;
+
+    if (chili.dataset.caught === "true") return;
 
     const chiliRect = chili.getBoundingClientRect();
 
@@ -275,6 +307,8 @@ function collectChili(chili, x, y) {
 
   if (!chili || !chili.parentElement) return;
 
+  chili.dataset.caught = "true";
+
   score++;
   scoreText.textContent = score;
 
@@ -287,11 +321,21 @@ function collectChili(chili, x, y) {
 function showMissEffect() {
   const target = document.querySelector(".aim-area");
 
-  if (!target) return;
+  if (target) {
+    target.classList.remove("miss");
+    void target.offsetWidth;
+    target.classList.add("miss");
+  }
 
-  target.classList.remove("miss");
-  void target.offsetWidth;
-  target.classList.add("miss");
+  const miss = document.createElement("div");
+  miss.className = "miss-text";
+  miss.textContent = "MISS";
+
+  document.body.appendChild(miss);
+
+  setTimeout(() => {
+    miss.remove();
+  }, 600);
 }
 
 function createHitEffect(x, y) {
@@ -404,7 +448,7 @@ function renderLeaderboard() {
     emptyRow.className = "leaderboard-item";
     emptyRow.innerHTML = `
       <span class="leaderboard-rank">-</span>
-      <span class="leaderboard-name">No score yet</span>
+      <span class="leaderboard-name">Belum ada skor</span>
       <span class="leaderboard-score">0</span>
     `;
 
@@ -433,7 +477,7 @@ async function shareScoreImage() {
 
     const file = new File(
       [imageBlob],
-      "chili-hunt-score.png",
+      "indomie-cabe-ijo-hunt-score.png",
       {
         type: "image/png"
       }
@@ -441,8 +485,8 @@ async function shareScoreImage() {
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
-        title: "Chili Hunt AR Score",
-        text: `I scored ${score} points in Chili Hunt AR!`,
+        title: "Indomie Cabe Ijo Hunt Score",
+        text: `Aku berhasil mengumpulkan ${score} Cabe Ijo di Indomie Cabe Ijo Hunt!`,
         files: [file]
       });
 
@@ -451,8 +495,8 @@ async function shareScoreImage() {
 
     if (navigator.share) {
       await navigator.share({
-        title: "Chili Hunt AR Score",
-        text: `I scored ${score} points in Chili Hunt AR!`
+        title: "Indomie Cabe Ijo Hunt Score",
+        text: `Aku berhasil mengumpulkan ${score} Cabe Ijo di Indomie Cabe Ijo Hunt!`
       });
 
       return;
@@ -461,7 +505,7 @@ async function shareScoreImage() {
     downloadScoreImage(imageBlob);
   } catch (error) {
     console.error("Share error:", error);
-    alert("Share is not available on this browser.");
+    alert("Fitur share tidak tersedia di browser ini.");
   }
 }
 
@@ -475,45 +519,56 @@ function createScoreImageBlob(scoreValue) {
     const ctx = canvas.getContext("2d");
 
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, "#17451f");
-    gradient.addColorStop(0.5, "#07130a");
+    gradient.addColorStop(0, "#1c5a21");
+    gradient.addColorStop(0.5, "#071a0b");
     gradient.addColorStop(1, "#020502");
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "rgba(185, 255, 106, 0.12)";
+    ctx.fillStyle = "rgba(202, 255, 114, 0.12)";
     ctx.beginPath();
     ctx.arc(540, 360, 330, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = "900 82px Arial";
+    ctx.fillStyle = "rgba(202, 255, 114, 0.08)";
+    ctx.beginPath();
+    ctx.arc(130, 1600, 290, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.font = "900 70px Arial";
     ctx.fillStyle = "#caff72";
     ctx.textAlign = "center";
-    ctx.fillText("CHILI HUNT AR", 540, 300);
+    ctx.fillText("INDOMIE", 540, 260);
+
+    ctx.font = "900 76px Arial";
+    ctx.fillText("CABE IJO HUNT", 540, 350);
 
     ctx.font = "400 44px Arial";
     ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
-    ctx.fillText("My Final Score", 540, 520);
+    ctx.fillText("Skor Cabe Ijo Kamu", 540, 545);
 
-    ctx.font = "900 220px Arial";
+    ctx.font = "900 230px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(scoreValue.toString(), 540, 780);
+    ctx.fillText(scoreValue.toString(), 540, 815);
 
-    ctx.font = "900 180px Arial";
-    ctx.fillText("🌶️", 540, 1060);
+    drawChiliIcon(ctx, 540, 1065);
 
     ctx.font = "500 44px Arial";
     ctx.fillStyle = "rgba(255, 255, 255, 0.84)";
-    ctx.fillText("Can you beat my score?", 540, 1270);
+    ctx.fillText("Berani kalahkan skor aku?", 540, 1290);
 
     ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-    roundRect(ctx, 160, 1410, 760, 140, 42);
+    roundRect(ctx, 150, 1420, 780, 145, 42);
     ctx.fill();
 
     ctx.font = "700 38px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("Play now and collect more chilies!", 540, 1495);
+    ctx.fillText("Main sekarang dan kumpulkan Cabe Ijo!", 540, 1508);
+
+    ctx.font = "400 30px Arial";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.fillText("Share your score", 540, 1695);
 
     canvas.toBlob((blob) => {
       resolve(blob);
@@ -521,12 +576,41 @@ function createScoreImageBlob(scoreValue) {
   });
 }
 
+function drawChiliIcon(ctx, x, y) {
+  ctx.save();
+
+  ctx.translate(x, y);
+  ctx.rotate(-0.35);
+
+  ctx.fillStyle = "#55e85b";
+  ctx.beginPath();
+  ctx.moveTo(-115, 40);
+  ctx.bezierCurveTo(-40, 110, 95, 60, 115, -35);
+  ctx.bezierCurveTo(30, 25, -35, 15, -115, 40);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(20, -5, 55, 18, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#8ad34a";
+  ctx.lineWidth = 18;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-20, -30);
+  ctx.quadraticCurveTo(-30, -95, 35, -115);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 function downloadScoreImage(blob) {
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = "chili-hunt-score.png";
+  link.download = "indomie-cabe-ijo-hunt-score.png";
 
   document.body.appendChild(link);
   link.click();

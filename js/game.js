@@ -78,6 +78,11 @@ const modalScoreText = document.getElementById("modalScoreText");
 const saveMessage = document.getElementById("saveMessage");
 const topFiveInfo = document.getElementById("topFiveInfo");
 
+const appNotice = document.getElementById("appNotice");
+const appNoticeTitle = document.getElementById("appNoticeTitle");
+const appNoticeText = document.getElementById("appNoticeText");
+const closeAppNoticeBtn = document.getElementById("closeAppNoticeBtn");
+
 const scoreText = document.getElementById("scoreText");
 const timerText = document.getElementById("timerText");
 const finalScoreText = document.getElementById("finalScoreText");
@@ -132,6 +137,7 @@ catchBtn.addEventListener("click", catchChiliByMarker);
 saveScoreBtn.addEventListener("click", openSaveScoreModal);
 closeSaveModalBtn.addEventListener("click", closeSaveScoreModal);
 submitScoreBtn.addEventListener("click", submitScore);
+closeAppNoticeBtn.addEventListener("click", closeAppNotice);
 
 /* =========================
    CAMERA
@@ -166,7 +172,8 @@ async function startCamera() {
   } catch (error) {
     console.error("Camera error:", error);
 
-    alert(
+    showAppNotice(
+      "Camera Needed",
       "Camera access is required to play this game. Please allow camera access."
     );
 
@@ -203,11 +210,17 @@ async function requestMotionPermission() {
         return true;
       }
 
-      alert("Motion access is needed to search for green chilies.");
+      showAppNotice(
+        "Motion Needed",
+        "Motion access is needed to search for green chilies."
+      );
       return false;
     } catch (error) {
       console.error("Motion permission error:", error);
-      alert("Motion access is needed to search for green chilies.");
+      showAppNotice(
+        "Motion Needed",
+        "Motion access is needed to search for green chilies."
+      );
       return false;
     }
   }
@@ -282,16 +295,16 @@ function updateMotionStatus() {
 ========================= */
 
 async function startGame() {
-  const cameraReady = await startCamera();
-
-  if (!cameraReady) {
-    return;
-  }
-
   const motionReady = await requestMotionPermission();
 
   if (!motionReady) {
-    stopCamera();
+    return;
+  }
+
+  const cameraReady = await startCamera();
+
+  if (!cameraReady) {
+    stopMotionDetection();
     return;
   }
 
@@ -775,6 +788,16 @@ function closeSaveScoreModal() {
   saveScoreModal.classList.add("hidden");
 }
 
+function showAppNotice(title, message) {
+  appNoticeTitle.textContent = title;
+  appNoticeText.textContent = message;
+  appNotice.classList.remove("hidden");
+}
+
+function closeAppNotice() {
+  appNotice.classList.add("hidden");
+}
+
 async function submitScore() {
   const playerName = playerNameInput.value.trim();
   const playerEmail = playerEmailInput.value.trim().toLowerCase();
@@ -894,7 +917,10 @@ async function shareScoreImage() {
     downloadScoreImage(imageBlob);
   } catch (error) {
     console.error("Share error:", error);
-    alert("Share is not available on this browser.");
+    showAppNotice(
+      "Share Unavailable",
+      "Share is not available on this browser."
+    );
   }
 }
 

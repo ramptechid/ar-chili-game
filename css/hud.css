@@ -414,6 +414,48 @@
   font-weight: 900;
 }
 
+/* APP NOTICE */
+.app-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.app-notice-card {
+  width: 100%;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 22px 18px 18px;
+  border-radius: 20px;
+  color: white;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(16, 31, 17, 0.98), rgba(8, 18, 10, 0.96));
+  border: 1px solid rgba(202, 255, 114, 0.22);
+  box-shadow:
+    0 28px 74px rgba(0, 0, 0, 0.58),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.app-notice-card h2 {
+  margin-bottom: 10px;
+  font-size: clamp(20px, 5.8vw, 24px);
+  line-height: 1.15;
+}
+
+.app-notice-card p {
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(14px, 3.7vw, 16px);
+  line-height: 1.45;
+}
+
 /* SAVE SCORE MODAL */
 .save-modal {
   position: fixed;
